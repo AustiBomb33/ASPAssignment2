@@ -18,14 +18,14 @@ namespace ASPAssignment2.Controllers
     public class AuthorsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
         public AuthorsController(ApplicationDbContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signIn)
         {
             _context = context;
-            this.userManager = userManager;
-            this.signInManager = signIn;
+            this._userManager = userManager;
+            this._signInManager = signIn;
         }
 
         [AllowAnonymous]
@@ -44,36 +44,37 @@ namespace ASPAssignment2.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Author
+            var Author = await _context.Author
                 .FirstOrDefaultAsync(m => m.AuthorId == id);
-            if (author == null)
+            if (Author == null)
             {
                 return NotFound();
             }
 
-            return View(author);
+            return View(Author);
         }
 
         // GET: Authors/Create
         public async Task<IActionResult> Create()
         {
-            Author author = new Author {AuthorName = HttpContext.Request.Query["AuthorName"], AccountID = HttpContext.Request.Query["AccountId"]};
+            Author Author = new Author {AuthorName = HttpContext.Request.Query["AuthorName"], AccountID = HttpContext.Request.Query["AccountId"]};
             if (ModelState.IsValid)
             {
                 foreach(Author a in _context.Set<Author>())
                 {
                     //if any existing author has the same account ID, redirect to Index to avoid duplication of the Author
+                    //this is used to properly handle OAuth logins
                     if (a.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value)
                     {
                         return RedirectToAction("Index");
                     }
                 }
 
-                _context.Add(author);
+                _context.Add(Author);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(author);
+            return View(Author);
         }
 
         // GET: Authors/Delete/5
@@ -84,15 +85,15 @@ namespace ASPAssignment2.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Author
+            var Author = await _context.Author
                 .FirstOrDefaultAsync(m => m.AuthorId == id);
-            if (author == null)
+            if (Author == null)
             {
                 return NotFound();
             }
 
-            if (author.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value) { 
-            return View(author);
+            if (Author.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value) { 
+            return View(Author);
             }
             return RedirectToAction("Index");
         }
@@ -103,25 +104,20 @@ namespace ASPAssignment2.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var author = await _context.Author.FindAsync(id);
-            foreach(Article ar in _context.Set<Article>())
+            foreach(Article a in _context.Set<Article>())
             {
-                if(ar.AuthorId == author.AuthorId)
+                if(a.AuthorId == author.AuthorId)
                 {
-                    _context.Remove(ar);
+                    _context.Remove(a);
                 }
             }
             _context.Author.Remove(author);
-            await userManager.DeleteAsync(userManager.FindByIdAsync(author.AccountID).Result);
+            await _userManager.DeleteAsync(_userManager.FindByIdAsync(author.AccountID).Result);
             await _context.SaveChangesAsync();
             //sign out user so that they can't look for some way to break my website with an invalid user GUID
-            await signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
 
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool AuthorExists(int id)
-        {
-            return _context.Author.Any(e => e.AuthorId == id);
         }
     }
 }

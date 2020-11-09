@@ -26,22 +26,22 @@ namespace ASPAssignment2.Controllers
         // GET: Articles
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Article.Include(a => a.Author);
-            return View(await applicationDbContext.ToListAsync());
+            var ApplicationDbContext = _context.Article.Include(a => a.Author);
+            return View(await ApplicationDbContext.ToListAsync());
         }
 
         [AllowAnonymous]
         // GET: Articles/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? Id)
         {
-            if (id == null)
+            if (Id == null)
             {
                 return NotFound();
             }
 
             var article = await _context.Article
                 .Include(a => a.Author)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == Id);
             if (article == null)
             {
                 return NotFound();
@@ -88,14 +88,14 @@ namespace ASPAssignment2.Controllers
         }
 
         // GET: Articles/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? Id)
         {
-            if (id == null)
+            if (Id == null)
             {
                 return NotFound();
             }
 
-            var article = await _context.Article.FindAsync(id);
+            var article = await _context.Article.FindAsync(Id);
             if (article == null)
             {
                 return NotFound();
@@ -166,15 +166,15 @@ namespace ASPAssignment2.Controllers
                 return NotFound();
             }
 
-            var article = await _context.Article
+            var Article = await _context.Article
                 .Include(a => a.Author)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (article == null)
+            if (Article == null)
             {
                 return NotFound();
             }
 
-            return View(article);
+            return View(Article);
         }
 
         // POST: Articles/Delete/5
@@ -182,19 +182,19 @@ namespace ASPAssignment2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var article = await _context.Article.FindAsync(id);
+            var Article = await _context.Article.FindAsync(id);
             foreach (Author a in _context.Set<Author>())
             {
                 if (a.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 {
-                    if(article.AuthorId != a.AuthorId)
+                    if(Article.AuthorId != a.AuthorId)
                     {
                         //redirect to index if user accesses unauthorized page
                         return RedirectToAction("Index");
                     }
                 }
             }
-            _context.Article.Remove(article);
+            _context.Article.Remove(Article);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
