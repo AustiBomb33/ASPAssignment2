@@ -32,6 +32,12 @@ namespace ASPAssignment2
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddAuthentication().AddGoogle(options => {
+                options.ClientId = Configuration.GetSection("Authentication:Google")["ClientId"];
+                options.ClientSecret = Configuration.GetSection("Authentication:Google")["ClientSecret"];
+            });
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
