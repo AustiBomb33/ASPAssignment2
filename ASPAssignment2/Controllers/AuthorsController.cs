@@ -58,6 +58,15 @@ namespace ASPAssignment2.Controllers
             Author author = new Author {AuthorName = HttpContext.Request.Query["AuthorName"], AccountID = HttpContext.Request.Query["AccountId"]};
             if (ModelState.IsValid)
             {
+                foreach(Author a in _context.Set<Author>())
+                {
+                    //if any existing author has the same account ID, redirect to Index to avoid duplication of the Author
+                    if (a.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                }
+
                 _context.Add(author);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
