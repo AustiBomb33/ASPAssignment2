@@ -7,36 +7,38 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Article</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Title)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Content)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Content)
-        </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.PeerReviewed)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.PeerReviewed)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Author)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Author.AuthorId)
         </dd>
     </dl>
+    <h4>Article</h4>
+    @Html.DisplayFor(model => model.Content)
+
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if(User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value == Model.Author.AccountID)
+    {
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+    } else
+    {
+        @:Log into @Model.Author.AuthorName's account to edit
+    } 
+    |<a asp-action="Index">Back to List</a>
 </div>

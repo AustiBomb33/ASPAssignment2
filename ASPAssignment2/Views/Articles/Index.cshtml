@@ -4,19 +4,19 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Articles</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.Identity.IsAuthenticated)
+{
+    @:<p>
+        <a asp-action="Create">Create New</a>
+    @:</p>
+}
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Content)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PeerReviewed)
@@ -28,26 +28,34 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PeerReviewed)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author.AuthorId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @item.PeerReviewed
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author.AuthorName)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    @if (User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value == item.Author.AccountID)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> @:|
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    }
+                    else if(User.Identity.IsAuthenticated)
+                    {
+                        @:Can't edit/delete others' articles
+                    } else
+                    {
+                        @:Log in to edit/delete
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

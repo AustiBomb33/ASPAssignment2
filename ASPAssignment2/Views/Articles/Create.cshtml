@@ -19,7 +19,8 @@
             </div>
             <div class="form-group">
                 <label asp-for="Content" class="control-label"></label>
-                <input asp-for="Content" class="form-control" />
+                <textarea asp-for="Content" class="form-control"></textarea>
+
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
@@ -29,7 +30,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="AuthorId" class="control-label"></label>
-                <select asp-for="AuthorId" class ="form-control" asp-items="ViewBag.AuthorId"></select>
+                <input asp-for="AuthorId" class ="form-text" value="@ViewBag.Author.AuthorId" readonly hidden/>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

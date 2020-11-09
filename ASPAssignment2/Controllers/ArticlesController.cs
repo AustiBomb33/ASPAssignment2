@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ASPAssignment2.Data;
 using ASPAssignment2.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace ASPAssignment2.Controllers
 {
+    [Authorize]
     public class ArticlesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,6 +22,7 @@ namespace ASPAssignment2.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
         // GET: Articles
         public async Task<IActionResult> Index()
         {
@@ -26,6 +30,7 @@ namespace ASPAssignment2.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [AllowAnonymous]
         // GET: Articles/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -48,7 +53,14 @@ namespace ASPAssignment2.Controllers
         // GET: Articles/Create
         public IActionResult Create()
         {
-            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "AuthorId", "AuthorId");
+            //find the current author in the table
+            foreach (Author a in _context.Set<Author>())
+            {
+                if(a.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                {
+                    ViewData["Author"] = a;
+                }
+            }
             return View();
         }
 
@@ -65,7 +77,13 @@ namespace ASPAssignment2.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "AuthorId", "AuthorId", article.AuthorId);
+            foreach (Author a in _context.Set<Author>())
+            {
+                if (a.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                {
+                    ViewData["Author"] = a;
+                }
+            }
             return View(article);
         }
 
@@ -82,7 +100,19 @@ namespace ASPAssignment2.Controllers
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "AuthorId", "AuthorId", article.AuthorId);
+            foreach (Author a in _context.Set<Author>())
+            {
+
+                if (a.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                {
+                if(article.AuthorId != a.AuthorId)
+                    {
+                        //redirect to index if user accesses unauthorized page
+                        return RedirectToAction("Index");
+                    }
+                    ViewData["Author"] = a;
+                }
+            }
             return View(article);
         }
 
@@ -118,7 +148,13 @@ namespace ASPAssignment2.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "AuthorId", "AuthorId", article.AuthorId);
+            foreach (Author a in _context.Set<Author>())
+            {
+                if (a.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                {
+                    ViewData["Author"] = a;
+                }
+            }
             return View(article);
         }
 
@@ -147,6 +183,17 @@ namespace ASPAssignment2.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var article = await _context.Article.FindAsync(id);
+            foreach (Author a in _context.Set<Author>())
+            {
+                if (a.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                {
+                    if(article.AuthorId != a.AuthorId)
+                    {
+                        //redirect to index if user accesses unauthorized page
+                        return RedirectToAction("Index");
+                    }
+                }
+            }
             _context.Article.Remove(article);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

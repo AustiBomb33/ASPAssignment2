@@ -31,6 +31,7 @@
                 @Html.DisplayFor(modelItem => item.AccountID)
             </td>
             <td>
+                <!--Authors cannot be edited because all information in Author is determined during Account Creation-->
                 <a asp-action="Details" asp-route-id="@item.AuthorId">Details</a> |
                 @if(User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value == item.AccountID)
                 {
