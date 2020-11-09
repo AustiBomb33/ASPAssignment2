@@ -4,8 +4,10 @@
     <h1 class="display-4">Welcome</h1>
     <h2>Austin Marcoux's Real News</h2>
     <p>This news site is very trustworthy, because I'm just an average guy with no reason to lie on the internet</p>
-    <p>Anybody can create their own author profile, by clicking the Register link at the top, or <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">right here</a></p>
+    <!--only prompt user to log in if they're not, because common sense-->
+    @if (!User.Identity.IsAuthenticated)
+    {
+    <p>Anybody can create their own author profile, by clicking the Register link at the top, or <a asp-area="Identity" asp-page="/Account/Register">right here</a></p>
+    }
     <p>If you'd like to view or edit articles, click on Article List, or <a asp-action="Index" asp-controller="Articles">right here</a></p>
-    <p>Fun fact: You're actually viewing a full, ground-up remake of my site. Initially I couldn't get Identity working and integrated how I intended, so I just remade it from the ground up</p>
-    <p>I think it went quite well, all things considered</p>
 </div>
