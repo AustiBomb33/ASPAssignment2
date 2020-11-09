@@ -1,15 +1,22 @@
 ﻿@model IEnumerable<ASPAssignment2.Models.Author>
+
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Authors</h1>
-<p>The Data in this list is bound to Accounts. Deletion from here will result in account deletion</p>
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.AuthorName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountID)
             </th>
             <th></th>
         </tr>
@@ -21,18 +28,12 @@
                 @Html.DisplayFor(modelItem => item.AuthorName)
             </td>
             <td>
-                @{
-                    //TODO: Make edit/delete buttons invisible unless logged in with right account
-                }
-                <!--removed edit button because information is related to Identity AspNetUser accounts, editing would destroy this relation and effectively ruin the user's account-->
+                @Html.DisplayFor(modelItem => item.AccountID)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.AuthorId">Details</a> |
-                @if (User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value == item.AccountID)
-                {
-                    <a asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a>
-                } else
-                {
-                   <a>Delete Unavailable</a> 
-                }
+                <a asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a>
             </td>
         </tr>
 }
