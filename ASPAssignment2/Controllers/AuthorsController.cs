@@ -19,11 +19,13 @@ namespace ASPAssignment2.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
 
-        public AuthorsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public AuthorsController(ApplicationDbContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signIn)
         {
             _context = context;
             this.userManager = userManager;
+            this.signInManager = signIn;
         }
 
         [AllowAnonymous]
@@ -101,10 +103,19 @@ namespace ASPAssignment2.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var author = await _context.Author.FindAsync(id);
-            //TODO: Delete all of the author's articles
+            foreach(Article ar in _context.Set<Article>())
+            {
+                if(ar.AuthorId == author.AuthorId)
+                {
+                    _context.Remove(ar);
+                }
+            }
             _context.Author.Remove(author);
             await userManager.DeleteAsync(userManager.FindByIdAsync(author.AccountID).Result);
             await _context.SaveChangesAsync();
+            //sign out user so that they can't look for some way to break my website with an invalid user GUID
+            await signInManager.SignOutAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
