@@ -7,24 +7,33 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ASPAssignment2.Data;
 using ASPAssignment2.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Principal;
+using System.Security.Claims;
 
 namespace ASPAssignment2.Controllers
 {
+[Authorize]
     public class AuthorsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> userManager;
 
-        public AuthorsController(ApplicationDbContext context)
+        public AuthorsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            this.userManager = userManager;
         }
 
+        [AllowAnonymous]
         // GET: Authors
         public async Task<IActionResult> Index()
         {
             return View(await _context.Author.ToListAsync());
         }
 
+        [AllowAnonymous]
         // GET: Authors/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -128,7 +137,10 @@ namespace ASPAssignment2.Controllers
                 return NotFound();
             }
 
+            if (author.AccountID == User.FindFirst(ClaimTypes.NameIdentifier).Value) { 
             return View(author);
+            }
+            return NotFound();
         }
 
         // POST: Authors/Delete/5
@@ -137,7 +149,9 @@ namespace ASPAssignment2.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var author = await _context.Author.FindAsync(id);
+            
             _context.Author.Remove(author);
+            await userManager.DeleteAsync(userManager.FindByIdAsync(author.AccountID).Result);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

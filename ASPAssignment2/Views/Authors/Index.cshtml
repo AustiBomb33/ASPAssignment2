@@ -31,9 +31,14 @@
                 @Html.DisplayFor(modelItem => item.AccountID)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.AuthorId">Details</a> |
+                @if(User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value == item.AccountID)
+                {
                 <a asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a>
+                } else
+                {
+                    <a>Delete Unavailable</a>
+                }
             </td>
         </tr>
 }
