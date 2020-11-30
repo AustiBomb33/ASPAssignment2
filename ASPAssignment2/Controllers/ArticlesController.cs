@@ -21,13 +21,12 @@ namespace ASPAssignment2.Controllers
         {
             _context = context;
         }
-
         [AllowAnonymous]
         // GET: Articles
         public async Task<IActionResult> Index()
         {
             var ApplicationDbContext = _context.Article.Include(a => a.Author);
-            return View(await ApplicationDbContext.ToListAsync());
+            return View("Index", await ApplicationDbContext.ToListAsync());
         }
 
         [AllowAnonymous]
@@ -47,7 +46,7 @@ namespace ASPAssignment2.Controllers
                 return NotFound();
             }
 
-            return View(article);
+            return View("Details", article);
         }
 
         // GET: Articles/Create
@@ -61,7 +60,7 @@ namespace ASPAssignment2.Controllers
                     ViewData["Author"] = a;
                 }
             }
-            return View();
+            return View("Create");
         }
 
         // POST: Articles/Create
@@ -174,7 +173,7 @@ namespace ASPAssignment2.Controllers
                 return NotFound();
             }
 
-            return View(Article);
+            return View("Delete", Article);
         }
 
         // POST: Articles/Delete/5
@@ -199,7 +198,7 @@ namespace ASPAssignment2.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ArticleExists(int id)
+        public bool ArticleExists(int id)
         {
             return _context.Article.Any(e => e.Id == id);
         }
