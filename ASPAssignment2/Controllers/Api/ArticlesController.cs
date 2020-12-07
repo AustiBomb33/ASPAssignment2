@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ASPAssignment2.Data;
 using ASPAssignment2.Models;
 
-namespace ASPAssignment2.Api
+namespace ASPAssignment2.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
